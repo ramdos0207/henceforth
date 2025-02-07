@@ -21,6 +21,7 @@ import (
 var commands = map[string]string{
 	"help":     "!help",     // ヘルプを表示する
 	"schedule": "!schedule", // 予約メッセージを作成する
+	"timeonly": "いつ",        // 時刻のみ指定して予約メッセージを作成する
 	"edit":     "!edit",     // 予約メッセージを編集する
 	"delete":   "!delete",   // 予約メッセージを削除する
 	"list":     "!list",     // 予約メッセージをリスト表示する

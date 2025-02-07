@@ -23,6 +23,14 @@ func scheduleHandler(c echo.Context, api *api.API, repo repository.Repository, r
 	}
 	return commonScheduleProcess(time, distChannel, distChannelID, body, repeat, c, api, repo, req)
 }
+func timeonlyHandler(c echo.Context, api *api.API, repo repository.Repository, req *event.MessageEvent) error {
+	// メッセージをパースし、要素を取得
+	time := strings.SplitN(req.GetText(), "\n", 3)[1]
+	body := strings.SplitN(req.GetText(), "\n", 3)[2]
+	distChannel := "このチャンネル"
+	distChannelID := req.GetChannelID()
+	return commonScheduleProcess(&time, &distChannel, &distChannelID, &body, nil, c, api, repo, req)
+}
 func commonScheduleProcess(time *string, distChannel *string, distChannelID *string, body *string, repeat *int, c echo.Context, api *api.API, repo repository.Repository, req *event.MessageEvent) error {
 	// 確認メッセージ
 	var confirmMes string
@@ -31,7 +39,7 @@ func commonScheduleProcess(time *string, distChannel *string, distChannelID *str
 		// 時間をパース
 		parsedTimes, err := parser.TimeParsePeriodic(time)
 		if err != nil {
-			service.SendCreateErrorMessage(api, req.GetChannelID(), fmt.Errorf("無効な時間表記です\n%s\n", err))
+			service.SendCreateErrorMessage(api, req.GetChannelID(), fmt.Errorf("無効な時間表記です\n%s", err))
 			return c.JSON(http.StatusBadRequest, errorMessage{Message: err.Error()})
 		}
 
@@ -39,7 +47,7 @@ func commonScheduleProcess(time *string, distChannel *string, distChannelID *str
 			// 定期投稿メッセージをDB に 登録
 			schMesPeriodic, err := service.ResisterSchMesPeriodic(repo, req.GetUserID(), *parsedTime, *distChannelID, *body, repeat)
 			if err != nil {
-				service.SendCreateErrorMessage(api, req.GetChannelID(), fmt.Errorf("DB エラーです\n%s\n", err))
+				service.SendCreateErrorMessage(api, req.GetChannelID(), fmt.Errorf("DB エラーです\n%s", err))
 				return c.JSON(http.StatusInternalServerError, errorMessage{Message: err.Error()})
 			}
 
@@ -56,21 +64,21 @@ func commonScheduleProcess(time *string, distChannel *string, distChannelID *str
 	} else { // 予約投稿
 		// repeat が入力されていたらエラーメッセージを送る
 		if repeat != nil {
-			service.SendCreateErrorMessage(api, req.GetChannelID(), fmt.Errorf("予約投稿でリピートは使用できません\n"))
-			return c.JSON(http.StatusBadRequest, errorMessage{Message: "予約投稿でリピートは使用できません\n"})
+			service.SendCreateErrorMessage(api, req.GetChannelID(), fmt.Errorf("予約投稿でリピートは使用できません"))
+			return c.JSON(http.StatusBadRequest, errorMessage{Message: "予約投稿でリピートは使用できません"})
 		}
 
 		// 時間をパース
 		parsedTime, err := parser.TimeParse(time)
 		if err != nil {
-			service.SendCreateErrorMessage(api, req.GetChannelID(), fmt.Errorf("無効な時間表記です\n%s\n", err))
+			service.SendCreateErrorMessage(api, req.GetChannelID(), fmt.Errorf("無効な時間表記です\n%s", err))
 			return c.JSON(http.StatusBadRequest, errorMessage{Message: err.Error()})
 		}
 
 		// 予約投稿メッセージを DB に登録
 		schMes, err := service.ResisterSchMes(repo, req.GetUserID(), *parsedTime, *distChannelID, *body)
 		if err != nil {
-			service.SendCreateErrorMessage(api, req.GetChannelID(), fmt.Errorf("DB エラーです\n%s\n", err))
+			service.SendCreateErrorMessage(api, req.GetChannelID(), fmt.Errorf("DB エラーです\n%s", err))
 			return c.JSON(http.StatusInternalServerError, errorMessage{Message: err.Error()})
 		}
 
