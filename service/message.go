@@ -12,17 +12,17 @@ import (
 
 // ヘルプメッセージを生成
 func CreateHelpMessage() string {
-	return "[Wiki](https://wiki.trap.jp/bot/Sch_Mes#head2) の使い方を参照してください！"
+	return "[Wiki](https://wiki.trap.jp/bot/Henceforth) の使い方を参照してください！"
 }
 
 // チャンネルに JOINED した際のメッセージを生成
 func CreateJoinedMessage(path string) string {
-	return fmt.Sprintf("これから Scheduled Messenger は`%s`に投稿されるメッセージをチェックします!\nいつでも呼んで下さい!", path)
+	return fmt.Sprintf("これから Henceforth は`%s`に投稿されるメッセージをチェックします!\nいつでも呼んで下さい!", path)
 }
 
 // チャンネルから LEFT した際のメッセージを生成
 func CreateLeftMessage() string {
-	return "寂しいですがお別れです...\nScheduled Messenger のご利用、ありがとうございました!"
+	return "寂しいですがお別れです...\nHenceforth のご利用、ありがとうございました!"
 }
 
 // 予約投稿メッセージ作成時 / 編集時のメッセージを生成
@@ -38,7 +38,7 @@ func CreateSchMesCreatedEditedMessage(parsedTime time.Time, distChannel *string,
 	}
 
 	// 残りの文字列を追加
-	mes += fmt.Sprintf("`%s`、以下の内容を投稿します。\n```plaintext\n%s\n```\n登録を取り消したい場合は次のコマンドを Scheduled Messenger に送信して下さい。\n`!delete -i %s`\n登録したメッセージを編集したい場合は次の Prefix を使って下さい。\n`!edit -i %s`",
+	mes += fmt.Sprintf("`%s`、以下の内容を投稿します。\n```plaintext\n%s\n```\n登録を取り消したい場合は次のコマンドを Henceforth に送信して下さい。\n`!delete -i %s`\n登録したメッセージを編集したい場合は次の Prefix を使って下さい。\n`!edit -i %s`",
 		parsedTime.Format("2006年01月02日 15時04分"),
 		body,
 		id.String(),
@@ -70,7 +70,7 @@ func CreateSchMesPeriodicCreatedEditedMessage(parsedTime model.PeriodicTime, dis
 
 	// 残りの文字列を追加
 	mes += fmt.Sprintf(
-		"以下の内容を投稿します。\n```plaintext\n%s\n```\n登録を取り消したい場合は次のコマンドを Scheduled Messenger に送信して下さい。\n`!delete -i %s`\n登録したメッセージを編集したい場合は次の Prefix を使って下さい。\n`!edit -i %s`",
+		"以下の内容を投稿します。\n```plaintext\n%s\n```\n登録を取り消したい場合は次のコマンドを Henceforth に送信して下さい。\n`!delete -i %s`\n登録したメッセージを編集したい場合は次の Prefix を使って下さい。\n`!edit -i %s`",
 		body,
 		id.String(),
 		id.String(),

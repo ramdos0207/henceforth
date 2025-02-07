@@ -25,7 +25,7 @@ func init() {
 
 func main() {
 	// ログを出力
-	log.Print("Initializing Scheduled Messenger Bot...")
+	log.Print("Initializing Henceforth Bot...")
 
 	// 設定を読み込む
 	c, err := config.GetConfig()
