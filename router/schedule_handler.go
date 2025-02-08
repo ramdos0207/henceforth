@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/logica0419/scheduled-messenger-bot/model/event"
@@ -25,11 +26,16 @@ func scheduleHandler(c echo.Context, api *api.API, repo repository.Repository, r
 }
 func timeonlyHandler(c echo.Context, api *api.API, repo repository.Repository, req *event.MessageEvent) error {
 	// メッセージをパースし、要素を取得
-	time := strings.SplitN(req.GetText(), "\n", 3)[1]
+	originalTime := strings.SplitN(req.GetText(), "\n", 3)[1]
 	body := strings.SplitN(req.GetText(), "\n", 3)[2]
 	distChannel := "このチャンネル"
+	formattedTime, err := service.Askllm(createTimeConvertPrompt(originalTime))
+	if err != nil {
+		service.SendCreateErrorMessage(api, req.GetChannelID(), fmt.Errorf("LLMによる時刻のパースに失敗しました\n%s", err))
+		return c.JSON(http.StatusBadRequest, errorMessage{Message: err.Error()})
+	}
 	distChannelID := req.GetChannelID()
-	return commonScheduleProcess(&time, &distChannel, &distChannelID, &body, nil, c, api, repo, req)
+	return commonScheduleProcess(&formattedTime, &distChannel, &distChannelID, &body, nil, c, api, repo, req)
 }
 func commonScheduleProcess(time *string, distChannel *string, distChannelID *string, body *string, repeat *int, c echo.Context, api *api.API, repo repository.Repository, req *event.MessageEvent) error {
 	// 確認メッセージ
@@ -37,7 +43,8 @@ func commonScheduleProcess(time *string, distChannel *string, distChannelID *str
 	// 時間の表記にワイルドカードが含まれているかで処理を分岐
 	if strings.Contains(*time, "*") { // 定期投稿
 		// 時間をパース
-		parsedTimes, err := parser.TimeParsePeriodic(time)
+		trimmedTime := strings.TrimSpace(*time)
+		parsedTimes, err := parser.TimeParsePeriodic(&trimmedTime)
 		if err != nil {
 			service.SendCreateErrorMessage(api, req.GetChannelID(), fmt.Errorf("無効な時間表記です\n%s", err))
 			return c.JSON(http.StatusBadRequest, errorMessage{Message: err.Error()})
@@ -69,7 +76,8 @@ func commonScheduleProcess(time *string, distChannel *string, distChannelID *str
 		}
 
 		// 時間をパース
-		parsedTime, err := parser.TimeParse(time)
+		trimmedTime := strings.TrimSpace(*time)
+		parsedTime, err := parser.TimeParse(&trimmedTime)
 		if err != nil {
 			service.SendCreateErrorMessage(api, req.GetChannelID(), fmt.Errorf("無効な時間表記です\n%s", err))
 			return c.JSON(http.StatusBadRequest, errorMessage{Message: err.Error()})
@@ -93,4 +101,7 @@ func commonScheduleProcess(time *string, distChannel *string, distChannelID *str
 	}
 
 	return c.NoContent(http.StatusNoContent)
+}
+func createTimeConvertPrompt(originalTime string) string {
+	return fmt.Sprintf("次の日時情報を、「2006/01/02/15:04」形式に直してください。現在時刻は%sです。「明日」のような曖昧な時刻が渡された場合、できるだけ4の倍数時、例えば8:00、16:00、20:00などを返すようにしてください。ただし、ユーザーが具体的な時刻を指定した場合はそちらを優先してください。年月日時刻のいずれも省略してはいけません。時刻のみが指定された場合は今後その時刻を迎えるできるだけ早い日時を返してください。時刻以外は何も返さないでください。直すべき時刻情報:%s", time.Now().Format("2006/01/02/15:04"), originalTime)
 }
