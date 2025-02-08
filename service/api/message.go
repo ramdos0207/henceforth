@@ -22,7 +22,7 @@ func (api *API) SendMessage(chanID string, message string) error {
 		url := fmt.Sprintf("%s/channels/%s/messages", baseUrl, chanID)
 
 		// ボディを作成
-		body := Message{Content: message, Embed: true}
+		body := Message{Content: message, Embed: false}
 
 		// リクエストを送信
 		err := api.post(url, body)

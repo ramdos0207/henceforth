@@ -38,7 +38,7 @@ type User struct {
 
 // メッセージテキスト 取得メソッド
 func (body *MessageEvent) GetText() string {
-	return body.Message.PlainText
+	return body.Message.Text
 }
 
 // チャンネルID 取得メソッド
