@@ -71,7 +71,7 @@ func commonScheduleProcess(time *string, distChannel *string, distChannelID *str
 
 		for _, parsedTime := range parsedTimes {
 			messageUUID := "023b8b87-3229-43df-9129-11805b87f307"
-			userUUID := "ebdff5a1-a39d-4a48-aa68-761bf98a8bca"
+			userUUID := req.Message.User.ID
 			// 定期投稿メッセージをDB に 登録
 			schMesPeriodic, err := service.ResisterSchMesPeriodic(repo, req.GetUserID(), messageUUID, userUUID, *parsedTime, *distChannelID, *body, repeat)
 			if err != nil {
@@ -104,7 +104,7 @@ func commonScheduleProcess(time *string, distChannel *string, distChannelID *str
 			return c.JSON(http.StatusBadRequest, errorMessage{Message: err.Error()})
 		}
 		messageUUID := "023b8b87-3229-43df-9129-11805b87f307"
-		userUUID := "ebdff5a1-a39d-4a48-aa68-761bf98a8bca"
+		userUUID := req.Message.User.ID
 
 		// 予約投稿メッセージを DB に登録
 		schMes, err := service.ResisterSchMes(repo, req.GetUserID(), userUUID, messageUUID, *parsedTime, *distChannelID, *body)

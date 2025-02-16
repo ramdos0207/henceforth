@@ -44,7 +44,7 @@ func (t *Timer) schMesHandler() {
 			defer wg.Done()
 
 			// メッセージを作成
-			sendingMes := service.CreateScheduledMessage(mes.UserID, mes.Body)
+			sendingMes := service.CreateScheduledMessage(mes.UserID, mes.UserUUID, mes.Body)
 
 			// 指定したチャンネルにメッセージを送信
 			err = t.api.SendMessage(mes.ChannelID.String(), sendingMes)
@@ -109,7 +109,7 @@ func (t *Timer) schMesPeriodicHandler() {
 			defer wg.Done()
 
 			// メッセージを作成
-			sendingMes := service.CreateScheduledMessage(mes.UserID, mes.Body)
+			sendingMes := service.CreateScheduledMessage(mes.UserID, mes.UserUUID, mes.Body)
 
 			// 指定したチャンネルにメッセージを送信
 			err = t.api.SendMessage(mes.ChannelID.String(), sendingMes)

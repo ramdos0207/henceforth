@@ -143,6 +143,6 @@ func formatRepeat(repeat *int) string {
 }
 
 // DB のレコードから実際に送るメッセージを生成
-func CreateScheduledMessage(userID string, body string) string {
-	return fmt.Sprintf("#### *@%s さんからのメッセージ*\n---\n%s", userID, body)
+func CreateScheduledMessage(userID string, userUUID uuid.UUID, body string) string {
+	return fmt.Sprintf("#### *!{\"type\":\"user\",\"raw\":\"%s\",\"id\":\"%s\"} さんからのメッセージ*\n---\n%s", userID, userUUID, body)
 }
