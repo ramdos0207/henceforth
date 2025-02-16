@@ -21,7 +21,7 @@ import (
 func helpHandler(c echo.Context, api *api.API, req *event.MessageEvent) error {
 	mes := service.CreateHelpMessage()
 
-	err := api.SendMessage(req.GetChannelID(), mes)
+	_, err := api.SendMessage(req.GetChannelID(), mes)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, errorMessage{Message: fmt.Sprintf("failed to send message: %s", err)})
 	}
@@ -134,7 +134,7 @@ func editHandler(c echo.Context, api *api.API, repo repository.Repository, req *
 	}
 
 	// 確認メッセージを送信
-	err = api.SendMessage(req.GetChannelID(), confirmMes)
+	_, err = api.SendMessage(req.GetChannelID(), confirmMes)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, errorMessage{Message: fmt.Sprintf("failed to send message: %s", err)})
 	}
@@ -192,7 +192,7 @@ periodic: // 定期投稿メッセージを DB から削除
 
 message: // 確認メッセージを送信
 	mes := service.CreateSchMesDeletedMessage(*id)
-	err = api.SendMessage(req.GetChannelID(), mes)
+	_, err = api.SendMessage(req.GetChannelID(), mes)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, errorMessage{Message: fmt.Sprintf("failed to send message: %s", err)})
 	}
@@ -219,7 +219,7 @@ func listHandler(c echo.Context, api *api.API, repo repository.Repository, req *
 
 	// 予約メッセージリストを送信
 	mes := service.CreateScheduleListMessage(mesList, mesListPeriodic)
-	err = api.SendMessage(req.GetChannelID(), mes)
+	_, err = api.SendMessage(req.GetChannelID(), mes)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, errorMessage{Message: fmt.Sprintf("failed to send message: %s", err)})
 	}

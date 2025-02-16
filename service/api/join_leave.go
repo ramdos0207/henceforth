@@ -17,7 +17,7 @@ func (api *API) ChannelAction(cmd string, chanID string) error {
 	body := ActionBody{ChannelID: chanID}
 
 	// リクエストを送信
-	err := api.post(url, body)
+	_, err := api.post(url, body)
 	if err != nil {
 		return err
 	}

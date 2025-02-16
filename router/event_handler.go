@@ -64,7 +64,7 @@ func systemHandler(c echo.Context, api *api.API) error {
 	}
 
 	// メッセージを JOINED / LEFT したチャンネルに送信
-	err = api.SendMessage(req.GetChannelID(), mes)
+	_, err = api.SendMessage(req.GetChannelID(), mes)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, errorMessage{Message: fmt.Sprintf("failed to send message: %s", err)})
 	}

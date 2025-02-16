@@ -19,7 +19,7 @@ func (t *Timer) schMesHandler() {
 	mesList, err := t.repo.GetSchMesByTime(currentTime)
 	if err != nil {
 		// エラーが発生した時は、ログを config で指定したチャンネルに送信
-		_ = t.api.SendMessage(t.c.Log_Chan_ID, fmt.Sprintf("ErrorLog: %s レコードの取得に失敗しました\n```\nError: %s\n```", currentTime.Format("01/02 15:04"), err.Error()))
+		t.api.SendMessage(t.c.Log_Chan_ID, fmt.Sprintf("ErrorLog: %s レコードの取得に失敗しました\n```\nError: %s\n```", currentTime.Format("01/02 15:04"), err.Error()))
 		return
 	}
 
@@ -47,10 +47,10 @@ func (t *Timer) schMesHandler() {
 			sendingMes := service.CreateScheduledMessage(mes.UserID, mes.UserUUID, mes.Body)
 
 			// 指定したチャンネルにメッセージを送信
-			err = t.api.SendMessage(mes.ChannelID.String(), sendingMes)
+			_, err = t.api.SendMessage(mes.ChannelID.String(), sendingMes)
 			// エラーが起きたらログを config で指定したチャンネルに送信
 			if err != nil {
-				_ = t.api.SendMessage(t.c.Log_Chan_ID, fmt.Sprintf("ErrorLog: %s メッセージの送信に失敗しました\n```\nID: %s\nError: %s\n```", currentTime.Format("01/02 15:04"), mes.ID, err.Error()))
+				t.api.SendMessage(t.c.Log_Chan_ID, fmt.Sprintf("ErrorLog: %s メッセージの送信に失敗しました\n```\nID: %s\nError: %s\n```", currentTime.Format("01/02 15:04"), mes.ID, err.Error()))
 				return
 			}
 
@@ -58,7 +58,7 @@ func (t *Timer) schMesHandler() {
 			err = t.repo.DeleteSchMesByID(mes.ID)
 			// エラーが起きたらログを config で指定したチャンネルに送信
 			if err != nil {
-				_ = t.api.SendMessage(t.c.Log_Chan_ID, fmt.Sprintf("ErrorLog: %s レコードの削除に失敗しました\n```\nID: %s\nError: %s\n```", currentTime.Format("01/02 15:04"), mes.ID, err.Error()))
+				t.api.SendMessage(t.c.Log_Chan_ID, fmt.Sprintf("ErrorLog: %s レコードの削除に失敗しました\n```\nID: %s\nError: %s\n```", currentTime.Format("01/02 15:04"), mes.ID, err.Error()))
 				return
 			}
 
@@ -81,7 +81,7 @@ func (t *Timer) schMesPeriodicHandler() {
 	mesList, err := t.repo.GetSchMesPeriodicAll()
 	if err != nil {
 		// エラーが発生した時は、ログを config で指定したチャンネルに送信
-		_ = t.api.SendMessage(t.c.Log_Chan_ID, fmt.Sprintf("ErrorLog: %s レコードの取得に失敗しました\n```\nError: %s\n```", currentTime.Format("01/02 15:04"), err.Error()))
+		t.api.SendMessage(t.c.Log_Chan_ID, fmt.Sprintf("ErrorLog: %s レコードの取得に失敗しました\n```\nError: %s\n```", currentTime.Format("01/02 15:04"), err.Error()))
 		return
 	}
 
@@ -112,10 +112,10 @@ func (t *Timer) schMesPeriodicHandler() {
 			sendingMes := service.CreateScheduledMessage(mes.UserID, mes.UserUUID, mes.Body)
 
 			// 指定したチャンネルにメッセージを送信
-			err = t.api.SendMessage(mes.ChannelID.String(), sendingMes)
+			_, err = t.api.SendMessage(mes.ChannelID.String(), sendingMes)
 			// エラーが起きたらログを config で指定したチャンネルに送信
 			if err != nil {
-				_ = t.api.SendMessage(t.c.Log_Chan_ID, fmt.Sprintf("ErrorLog: %s メッセージの送信に失敗しました\n```\nID: %s\nError: %s\n```", currentTime.Format("01/02 15:04"), mes.ID, err.Error()))
+				t.api.SendMessage(t.c.Log_Chan_ID, fmt.Sprintf("ErrorLog: %s メッセージの送信に失敗しました\n```\nID: %s\nError: %s\n```", currentTime.Format("01/02 15:04"), mes.ID, err.Error()))
 				return
 			}
 
@@ -127,7 +127,7 @@ func (t *Timer) schMesPeriodicHandler() {
 				if repeat == 0 {
 					err = t.repo.DeleteSchMesPeriodicByID(mes.ID)
 					if err != nil {
-						_ = t.api.SendMessage(t.c.Log_Chan_ID, fmt.Sprintf("ErrorLog: %s レコードの削除に失敗しました\n```\nID: %s\nError: %s\n```", currentTime.Format("01/02 15:04"), mes.ID, err.Error()))
+						t.api.SendMessage(t.c.Log_Chan_ID, fmt.Sprintf("ErrorLog: %s レコードの削除に失敗しました\n```\nID: %s\nError: %s\n```", currentTime.Format("01/02 15:04"), mes.ID, err.Error()))
 						return
 					}
 				} else {
@@ -142,7 +142,7 @@ func (t *Timer) schMesPeriodicHandler() {
 							Body:      mes.Body,
 						})
 					if err != nil {
-						_ = t.api.SendMessage(t.c.Log_Chan_ID, fmt.Sprintf("ErrorLog: %s レコードの更新に失敗しました\n```\nID: %s\nError: %s\n```", currentTime.Format("01/02 15:04"), mes.ID, err.Error()))
+						t.api.SendMessage(t.c.Log_Chan_ID, fmt.Sprintf("ErrorLog: %s レコードの更新に失敗しました\n```\nID: %s\nError: %s\n```", currentTime.Format("01/02 15:04"), mes.ID, err.Error()))
 						return
 					}
 				}

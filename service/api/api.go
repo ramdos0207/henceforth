@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 
@@ -38,17 +39,17 @@ func setJsonHeader(req *http.Request) {
 }
 
 // POST リクエストを送信
-func (api *API) post(url string, body interface{}) error {
+func (api *API) post(url string, body interface{}) ([]byte, error) {
 	// ボディをバイト列に変換
 	byteBody, err := json.Marshal(body)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// 変換したボディを載せて POST リクエストを作成
 	req, err := http.NewRequest("POST", url, bytes.NewReader(byteBody))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// ヘッダーを設定
@@ -62,11 +63,12 @@ func (api *API) post(url string, body interface{}) error {
 		log.Println(*res)
 	}
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if res.StatusCode >= 300 {
-		return fmt.Errorf(res.Status)
+		return nil, fmt.Errorf(res.Status)
 	}
-
-	return nil
+	defer res.Body.Close()
+	resbody, _ := io.ReadAll(res.Body)
+	return resbody, nil
 }

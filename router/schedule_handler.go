@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/logica0419/scheduled-messenger-bot/model/event"
 	"github.com/logica0419/scheduled-messenger-bot/repository"
@@ -70,23 +71,27 @@ func commonScheduleProcess(time *string, distChannel *string, distChannelID *str
 		}
 
 		for _, parsedTime := range parsedTimes {
-			messageUUID := "023b8b87-3229-43df-9129-11805b87f307"
+
+			id, err := uuid.NewRandom()
+			if err != nil {
+				service.SendCreateErrorMessage(api, req.GetChannelID(), fmt.Errorf("UUIDの生成に失敗しました\n%s", err))
+			}
+			// 確認メッセージを生成
+			confirmMes = service.CreateSchMesPeriodicCreatedEditedMessage(*parsedTime, distChannel, *body, id, repeat)
+
+			// 確認メッセージを送信
+			messageUUID, err := api.SendMessage(req.GetChannelID(), confirmMes)
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, errorMessage{Message: fmt.Sprintf("failed to send message: %s", err)})
+			}
 			userUUID := req.Message.User.ID
 			// 定期投稿メッセージをDB に 登録
-			schMesPeriodic, err := service.ResisterSchMesPeriodic(repo, req.GetUserID(), messageUUID, userUUID, *parsedTime, *distChannelID, *body, repeat)
+			_, err = service.ResisterSchMesPeriodic(repo, id, req.GetUserID(), messageUUID, userUUID, *parsedTime, *distChannelID, *body, repeat)
 			if err != nil {
 				service.SendCreateErrorMessage(api, req.GetChannelID(), fmt.Errorf("DB エラーです\n%s", err))
 				return c.JSON(http.StatusInternalServerError, errorMessage{Message: err.Error()})
 			}
 
-			// 確認メッセージを生成
-			confirmMes = service.CreateSchMesPeriodicCreatedEditedMessage(schMesPeriodic.Time, distChannel, schMesPeriodic.Body, schMesPeriodic.ID, schMesPeriodic.Repeat)
-
-			// 確認メッセージを送信
-			err = api.SendMessage(req.GetChannelID(), confirmMes)
-			if err != nil {
-				return c.JSON(http.StatusInternalServerError, errorMessage{Message: fmt.Sprintf("failed to send message: %s", err)})
-			}
 		}
 
 	} else { // 予約投稿
@@ -103,24 +108,30 @@ func commonScheduleProcess(time *string, distChannel *string, distChannelID *str
 			service.SendCreateErrorMessage(api, req.GetChannelID(), fmt.Errorf("無効な時間表記です\n%s", err))
 			return c.JSON(http.StatusBadRequest, errorMessage{Message: err.Error()})
 		}
-		messageUUID := "023b8b87-3229-43df-9129-11805b87f307"
+		// ID を生成
+		id, err := uuid.NewRandom()
+		if err != nil {
+			service.SendCreateErrorMessage(api, req.GetChannelID(), fmt.Errorf("UUIDの生成に失敗しました\n%s", err))
+			return c.JSON(http.StatusBadRequest, errorMessage{Message: err.Error()})
+		}
+		// 確認メッセージを生成
+		confirmMes = service.CreateSchMesCreatedEditedMessage(*parsedTime, distChannel, *body, id)
+
+		// 確認メッセージを送信
+		messageUUID, err := api.SendMessage(req.GetChannelID(), confirmMes)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, errorMessage{Message: fmt.Sprintf("failed to send message: %s", err)})
+		}
+
 		userUUID := req.Message.User.ID
 
 		// 予約投稿メッセージを DB に登録
-		schMes, err := service.ResisterSchMes(repo, req.GetUserID(), userUUID, messageUUID, *parsedTime, *distChannelID, *body)
+		_, err = service.ResisterSchMes(repo, id, req.GetUserID(), userUUID, messageUUID, *parsedTime, *distChannelID, *body)
 		if err != nil {
 			service.SendCreateErrorMessage(api, req.GetChannelID(), fmt.Errorf("DB エラーです\n%s", err))
 			return c.JSON(http.StatusInternalServerError, errorMessage{Message: err.Error()})
 		}
 
-		// 確認メッセージを生成
-		confirmMes = service.CreateSchMesCreatedEditedMessage(schMes.Time, distChannel, schMes.Body, schMes.ID)
-
-		// 確認メッセージを送信
-		err = api.SendMessage(req.GetChannelID(), confirmMes)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, errorMessage{Message: fmt.Sprintf("failed to send message: %s", err)})
-		}
 	}
 
 	return c.NoContent(http.StatusNoContent)

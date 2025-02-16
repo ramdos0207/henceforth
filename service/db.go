@@ -30,7 +30,7 @@ func GetSchMesByID(repo repository.Repository, mesID string) (*model.SchMes, err
 }
 
 // 新たな予約投稿メッセージを生成し、DB に登録
-func ResisterSchMes(repo repository.Repository, userID string, userUUIDstring string, messageID string, time time.Time, channelID string, body string) (*model.SchMes, error) {
+func ResisterSchMes(repo repository.Repository, id uuid.UUID, userID string, userUUIDstring string, messageID string, time time.Time, channelID string, body string) (*model.SchMes, error) {
 	// チャンネル ID を UUID に変換
 	channelUUID, err := uuid.Parse(channelID)
 	if err != nil {
@@ -46,7 +46,7 @@ func ResisterSchMes(repo repository.Repository, userID string, userUUIDstring st
 	}
 
 	// 新たな SchMes 構造体型変数を生成
-	schMes, err := generateSchMes(userID, time, userUUID, messageUUID, channelUUID, body)
+	schMes, err := generateSchMes(id, userID, time, userUUID, messageUUID, channelUUID, body)
 	if err != nil {
 		return nil, err
 	}
@@ -61,12 +61,7 @@ func ResisterSchMes(repo repository.Repository, userID string, userUUIDstring st
 }
 
 // 新たな SchMes 構造体型変数を生成
-func generateSchMes(userID string, time time.Time, userUUID uuid.UUID, messageUUID uuid.UUID, channelID uuid.UUID, body string) (*model.SchMes, error) {
-	// ID を生成
-	id, err := uuid.NewRandom()
-	if err != nil {
-		return nil, err
-	}
+func generateSchMes(id uuid.UUID, userID string, time time.Time, userUUID uuid.UUID, messageUUID uuid.UUID, channelID uuid.UUID, body string) (*model.SchMes, error) {
 
 	// SchMes 構造体型変数を生成
 	return &model.SchMes{

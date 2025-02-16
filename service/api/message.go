@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 )
@@ -10,13 +11,17 @@ type Message struct {
 	Content string `json:"content,omitempty"`
 	Embed   bool   `json:"embed,omitempty"`
 }
+type MessageRes struct {
+	// メッセージUUID
+	Id string `json:"id"`
+}
 
-// 指定されたチャンネルに指定されたメッセージを投稿
-func (api *API) SendMessage(chanID string, message string) error {
+// 指定されたチャンネルに指定されたメッセージを投稿してメッセージの UUID を返す
+func (api *API) SendMessage(chanID string, message string) (string, error) {
 	// 開発モードではコンソールにメッセージを表示するのみ
 	if api.config.Dev_Mode {
 		log.Printf("Sending\n%s\nto %s", message, chanID)
-		return nil
+		return "", nil
 	} else {
 		// URL を生成
 		url := fmt.Sprintf("%s/channels/%s/messages", baseUrl, chanID)
@@ -25,16 +30,19 @@ func (api *API) SendMessage(chanID string, message string) error {
 		body := Message{Content: message, Embed: false}
 
 		// リクエストを送信
-		err := api.post(url, body)
+		res, err := api.post(url, body)
 		if err != nil {
-			return err
+			return "", err
 		}
-
-		return nil
+		var mesRes MessageRes
+		if err := json.Unmarshal(res, &mesRes); err != nil {
+			return "", err
+		}
+		return mesRes.Id, nil
 	}
 }
 
 // デプロイ完了を config で設定したチャンネルに通知
 func (api *API) NotifyDeployed() {
-	_ = api.SendMessage(api.config.Log_Chan_ID, "Log: The new version of Scheduled Messenger is deployed.")
+	api.SendMessage(api.config.Log_Chan_ID, "Log: The new version of Scheduled Messenger is deployed.")
 }
