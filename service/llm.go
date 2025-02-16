@@ -9,6 +9,7 @@ import (
 	"google.golang.org/api/option"
 )
 
+// 生成AIに質問を投げる
 func Askllm(question string) (string, error) {
 	ctx := context.Background()
 	fmt.Println(question)
