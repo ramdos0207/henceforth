@@ -20,7 +20,7 @@ func Askllm(question string) (string, error) {
 	defer client.Close()
 
 	// 質問を送信して回答を取得する
-	model := client.GenerativeModel("models/gemini-2.0-flash-lite-preview-02-05")
+	model := client.GenerativeModel("models/gemini-2.0-flash")
 	prompt := genai.Text(question)
 	resp, err := model.GenerateContent(ctx, prompt)
 	if err != nil {
