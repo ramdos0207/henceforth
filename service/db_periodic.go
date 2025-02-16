@@ -25,15 +25,23 @@ func GetSchMesPeriodicByID(repo repository.Repository, mesID string) (*model.Sch
 }
 
 // 新たな定期投稿メッセージを生成し、DB に登録
-func ResisterSchMesPeriodic(repo repository.Repository, userID string, time model.PeriodicTime, channelID string, body string, repeat *int) (*model.SchMesPeriodic, error) {
+func ResisterSchMesPeriodic(repo repository.Repository, userID string, userUUIDstring string, MessageID string, time model.PeriodicTime, channelID string, body string, repeat *int) (*model.SchMesPeriodic, error) {
 	// チャンネル ID を UUID に変換
 	channelUUID, err := uuid.Parse(channelID)
 	if err != nil {
 		return nil, err
 	}
+	userUUID, err := uuid.Parse(userUUIDstring)
+	if err != nil {
+		return nil, err
+	}
+	messageUUID, err := uuid.Parse(MessageID)
+	if err != nil {
+		return nil, err
+	}
 
 	// 新たな SchMesPeriodic 構造体型変数を生成
-	schMesPeriodic, err := generateSchMesPeriodic(userID, time, channelUUID, body, repeat)
+	schMesPeriodic, err := generateSchMesPeriodic(userID, userUUID, messageUUID, time, channelUUID, body, repeat)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +56,7 @@ func ResisterSchMesPeriodic(repo repository.Repository, userID string, time mode
 }
 
 // 新たな SchMesPeriodic 構造体型変数を生成
-func generateSchMesPeriodic(userID string, time model.PeriodicTime, channelID uuid.UUID, body string, repeat *int) (*model.SchMesPeriodic, error) {
+func generateSchMesPeriodic(userID string, userUUID uuid.UUID, messageUUID uuid.UUID, time model.PeriodicTime, channelID uuid.UUID, body string, repeat *int) (*model.SchMesPeriodic, error) {
 	// ID を生成
 	id, err := uuid.NewRandom()
 	if err != nil {
@@ -61,6 +69,8 @@ func generateSchMesPeriodic(userID string, time model.PeriodicTime, channelID uu
 		UserID:    userID,
 		Time:      time,
 		Repeat:    repeat,
+		MessageID: messageUUID,
+		UserUUID:  userUUID,
 		ChannelID: channelID,
 		Body:      body,
 	}, nil

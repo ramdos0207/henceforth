@@ -13,6 +13,8 @@ type SchMesPeriodic struct {
 	UserID    string       `gorm:"type:varchar(32);not null;index"`   // 予約ユーザーの traQ ID
 	Time      PeriodicTime `gorm:"embedded;embeddedPrefix:time_"`     // 定期投稿する時間
 	Repeat    *int         `gorm:"type:int"`                          // 定期投稿する回数
+	MessageID uuid.UUID    `gorm:"type:char(36);not null"`            // Botから送信されたメッセージのID
+	UserUUID  uuid.UUID    `gorm:"type:char(36);not null"`            // 予約ユーザーの UUID
 	ChannelID uuid.UUID    `gorm:"type:char(36);not null"`            // 投稿先チャンネルの ID
 	Body      string       `gorm:"not null"`                          // メッセージ本文
 }

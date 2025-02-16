@@ -70,8 +70,10 @@ func commonScheduleProcess(time *string, distChannel *string, distChannelID *str
 		}
 
 		for _, parsedTime := range parsedTimes {
+			messageUUID := "023b8b87-3229-43df-9129-11805b87f307"
+			userUUID := "ebdff5a1-a39d-4a48-aa68-761bf98a8bca"
 			// 定期投稿メッセージをDB に 登録
-			schMesPeriodic, err := service.ResisterSchMesPeriodic(repo, req.GetUserID(), *parsedTime, *distChannelID, *body, repeat)
+			schMesPeriodic, err := service.ResisterSchMesPeriodic(repo, req.GetUserID(), messageUUID, userUUID, *parsedTime, *distChannelID, *body, repeat)
 			if err != nil {
 				service.SendCreateErrorMessage(api, req.GetChannelID(), fmt.Errorf("DB エラーです\n%s", err))
 				return c.JSON(http.StatusInternalServerError, errorMessage{Message: err.Error()})
@@ -101,9 +103,11 @@ func commonScheduleProcess(time *string, distChannel *string, distChannelID *str
 			service.SendCreateErrorMessage(api, req.GetChannelID(), fmt.Errorf("無効な時間表記です\n%s", err))
 			return c.JSON(http.StatusBadRequest, errorMessage{Message: err.Error()})
 		}
+		messageUUID := "023b8b87-3229-43df-9129-11805b87f307"
+		userUUID := "ebdff5a1-a39d-4a48-aa68-761bf98a8bca"
 
 		// 予約投稿メッセージを DB に登録
-		schMes, err := service.ResisterSchMes(repo, req.GetUserID(), *parsedTime, *distChannelID, *body)
+		schMes, err := service.ResisterSchMes(repo, req.GetUserID(), userUUID, messageUUID, *parsedTime, *distChannelID, *body)
 		if err != nil {
 			service.SendCreateErrorMessage(api, req.GetChannelID(), fmt.Errorf("DB エラーです\n%s", err))
 			return c.JSON(http.StatusInternalServerError, errorMessage{Message: err.Error()})
