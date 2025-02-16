@@ -47,5 +47,5 @@ func (api *API) SendMessage(chanID string, message string) (string, error) {
 
 // デプロイ完了を config で設定したチャンネルに通知
 func (api *API) NotifyDeployed() {
-	api.SendMessage(api.config.Log_Chan_ID, "Log: The new version of Scheduled Messenger is deployed.")
+	api.SendMessage(api.config.Log_Chan_ID, "Log: The new version of Henceforth is deployed.")
 }
