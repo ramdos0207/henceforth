@@ -31,5 +31,6 @@ func Askllm(question string) (string, error) {
 			result += string(txt)
 		}
 	}
+	fmt.Println(result)
 	return result, nil
 }

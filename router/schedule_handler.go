@@ -103,5 +103,10 @@ func commonScheduleProcess(time *string, distChannel *string, distChannelID *str
 	return c.NoContent(http.StatusNoContent)
 }
 func createTimeConvertPrompt(originalTime string) string {
-	return fmt.Sprintf("次の日時情報を、「2006/01/02/15:04」形式に直してください。現在時刻は%sです。「明日」のような曖昧な時刻が渡された場合、できるだけ4の倍数時、例えば8:00、16:00、20:00などを返すようにしてください。ただし、ユーザーが具体的な時刻を指定した場合はそちらを優先してください。年月日時刻のいずれも省略してはいけません。時刻のみが指定された場合は今後その時刻を迎えるできるだけ早い日時を返してください。時刻以外は何も返さないでください。直すべき時刻情報:%s", time.Now().Format("2006/01/02/15:04"), originalTime)
+	tomorrow := time.Now().AddDate(0, 0, 1)
+	answer1 := time.Date(tomorrow.Year(), tomorrow.Month(), tomorrow.Day(), 8, 0, 0, 0, time.Local).Format("2006/01/02/15:04")
+	answer2 := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 17, 0, 0, 0, time.Local).Format("2006/01/02/15:04")
+	nextweek := time.Now().AddDate(0, 0, 7)
+	anser3 := time.Date(nextweek.Year(), nextweek.Month(), nextweek.Day(), 8, 0, 0, 0, time.Local).Format("2006/01/02/15:04")
+	return fmt.Sprintf("あなたの仕事は、ユーザーから与えられた時刻をフォーマットすることです。現在時刻は%sです。時刻以外は何も返さないでください。いくつか例を示します。「明日の朝」→「%s」、「夕方」→「%s」、「来週」→「%s」。ユーザーから与えられた時刻: %s", time.Now().Format("2006/01/02/15:04"), answer1, answer2, anser3, originalTime)
 }
