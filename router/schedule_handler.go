@@ -37,6 +37,19 @@ func timeonlyHandler(c echo.Context, api *api.API, repo repository.Repository, r
 	distChannelID := req.GetChannelID()
 	return commonScheduleProcess(&formattedTime, &distChannel, &distChannelID, &body, nil, c, api, repo, req)
 }
+func repeatonlyHandler(c echo.Context, api *api.API, repo repository.Repository, req *event.MessageEvent) error {
+	// メッセージをパースし、要素を取得
+	originalTime := strings.SplitN(req.GetText(), "\n", 3)[1]
+	body := strings.SplitN(req.GetText(), "\n", 3)[2]
+	distChannel := "このチャンネル"
+	formattedTime, err := service.Askllm(createRepeatConvertPrompt(originalTime))
+	if err != nil {
+		service.SendCreateErrorMessage(api, req.GetChannelID(), fmt.Errorf("LLMによる時刻のパースに失敗しました\n%s", err))
+		return c.JSON(http.StatusBadRequest, errorMessage{Message: err.Error()})
+	}
+	distChannelID := req.GetChannelID()
+	return commonScheduleProcess(&formattedTime, &distChannel, &distChannelID, &body, nil, c, api, repo, req)
+}
 func commonScheduleProcess(time *string, distChannel *string, distChannelID *string, body *string, repeat *int, c echo.Context, api *api.API, repo repository.Repository, req *event.MessageEvent) error {
 	// 確認メッセージ
 	var confirmMes string
@@ -109,4 +122,8 @@ func createTimeConvertPrompt(originalTime string) string {
 	nextweek := time.Now().AddDate(0, 0, 7)
 	anser3 := time.Date(nextweek.Year(), nextweek.Month(), nextweek.Day(), 8, 0, 0, 0, time.Local).Format("2006/01/02/15:04")
 	return fmt.Sprintf("あなたの仕事は、ユーザーから与えられた時刻をフォーマットすることです。現在時刻は%sです。時刻以外は何も返さないでください。いくつか例を示します。「明日の朝」→「%s」、「夕方」→「%s」、「来週」→「%s」。ユーザーから与えられた時刻: %s", time.Now().Format("2006/01/02/15:04"), answer1, answer2, anser3, originalTime)
+}
+func createRepeatConvertPrompt(originalTime string) string {
+	currenttime := time.Now().Format("15:04")
+	return fmt.Sprintf("あなたの仕事は、ユーザーから与えられた反復タスクの予約を「年/月/日/時:分/曜日」形式にフォーマットすることです。曜日は日曜日が0、月曜日が1、火曜日が2、水曜日が3、木曜日が4、金曜日が5、土曜日が6で、&を用いて複数指定できます。年・月・日・時・分・曜日に関して、いつでも良い場合は「*」と指定してください。現在時刻は%sなので、ユーザーが日付のみを指定した場合は現在時刻を指定してください。フォーマットされた結果以外は何も返さないでください。いくつか例を示します。「毎年12月31日の夕方」→「*/12/31/17:00/*」、「平日」→「*/*/*/%s/1&2&3&4&5」、「毎週水曜の夜」→「*/*/*/20:00/3」、「13日」→「*/*/13/%s/3」。ユーザーから与えられた予約情報: %s", time.Now().Format("2006/01/02/15:04"), currenttime, currenttime, originalTime)
 }

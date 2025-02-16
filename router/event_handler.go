@@ -79,36 +79,34 @@ func messageEventHandler(c echo.Context, api *api.API, repo repository.Repositor
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, errorMessage{Message: fmt.Sprintf("failed to get request body: %s", err)})
 	}
+	fmt.Println(req.GetUserID(), req.GetText())
 
-	// コマンドが含まれていた場合、コマンドハンドラーを呼び出す
-	for _, cmd := range commands {
-		if strings.Contains(req.GetText(), cmd) {
-			switch cmd {
-			case commands["help"]:
-				return helpHandler(c, api, req)
-
-			case commands["schedule"]:
-				return scheduleHandler(c, api, repo, req)
-
-			case commands["timeonly"]:
-				return timeonlyHandler(c, api, repo, req)
-
-			case commands["edit"]:
-				return editHandler(c, api, repo, req)
-
-			case commands["delete"]:
-				return deleteHandler(c, api, repo, req)
-
-			case commands["list"]:
-				return listHandler(c, api, repo, req)
-
-			case commands["join"]:
-				return joinHandler(c, api, req)
-
-			case commands["leave"]:
-				return leaveHandler(c, api, req)
-			}
-		}
+	if strings.Contains(req.GetText(), "!help") {
+		return helpHandler(c, api, req)
+	}
+	if strings.Contains(req.GetText(), "!schedule") {
+		return scheduleHandler(c, api, repo, req)
+	}
+	if strings.Contains(req.GetText(), "いつ") {
+		return timeonlyHandler(c, api, repo, req)
+	}
+	if strings.Contains(req.GetText(), "くりかえす") {
+		return repeatonlyHandler(c, api, repo, req)
+	}
+	if strings.Contains(req.GetText(), "!edit") {
+		return editHandler(c, api, repo, req)
+	}
+	if strings.Contains(req.GetText(), "!delete") {
+		return deleteHandler(c, api, repo, req)
+	}
+	if strings.Contains(req.GetText(), "!list") {
+		return listHandler(c, api, repo, req)
+	}
+	if strings.Contains(req.GetText(), "!join") {
+		return joinHandler(c, api, req)
+	}
+	if strings.Contains(req.GetText(), "!leave") {
+		return leaveHandler(c, api, req)
 	}
 
 	return c.NoContent(http.StatusNoContent)
