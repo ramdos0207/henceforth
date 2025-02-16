@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+
+	"github.com/google/uuid"
 )
 
 // メッセージ投稿リクエストボディ
@@ -21,7 +23,8 @@ func (api *API) SendMessage(chanID string, message string) (string, error) {
 	// 開発モードではコンソールにメッセージを表示するのみ
 	if api.config.Dev_Mode {
 		log.Printf("Sending\n%s\nto %s", message, chanID)
-		return "", nil
+		id, _ := uuid.NewRandom()
+		return id.String(), nil // ダミーの UUID を返す
 	} else {
 		// URL を生成
 		url := fmt.Sprintf("%s/channels/%s/messages", baseUrl, chanID)

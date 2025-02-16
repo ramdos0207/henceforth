@@ -86,7 +86,7 @@ func commonScheduleProcess(time *string, distChannel *string, distChannelID *str
 			}
 			userUUID := req.Message.User.ID
 			// 定期投稿メッセージをDB に 登録
-			_, err = service.ResisterSchMesPeriodic(repo, id, req.GetUserID(), messageUUID, userUUID, *parsedTime, *distChannelID, *body, repeat)
+			_, err = service.ResisterSchMesPeriodic(repo, id, req.GetUserID(), userUUID, messageUUID, *parsedTime, *distChannelID, *body, repeat)
 			if err != nil {
 				service.SendCreateErrorMessage(api, req.GetChannelID(), fmt.Errorf("DB エラーです\n%s", err))
 				return c.JSON(http.StatusInternalServerError, errorMessage{Message: err.Error()})
@@ -124,7 +124,6 @@ func commonScheduleProcess(time *string, distChannel *string, distChannelID *str
 		}
 
 		userUUID := req.Message.User.ID
-
 		// 予約投稿メッセージを DB に登録
 		_, err = service.ResisterSchMes(repo, id, req.GetUserID(), userUUID, messageUUID, *parsedTime, *distChannelID, *body)
 		if err != nil {
