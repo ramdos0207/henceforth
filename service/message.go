@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -38,9 +39,10 @@ func CreateSchMesCreatedEditedMessage(parsedTime time.Time, distChannel *string,
 	}
 
 	// 残りの文字列を追加
-	mes += fmt.Sprintf("`%s`、以下の内容を投稿します。\n```plaintext\n%s\n```\n登録を取り消したい場合は次のコマンドを Henceforth に送信して下さい。\n`!delete -i %s`\n登録したメッセージを編集したい場合は次の Prefix を使って下さい。\n`!edit -i %s`",
+	mes += fmt.Sprintf("`%s`、以下の内容を投稿します。\n```plaintext\n%s\n```\n登録を取り消したい場合はこのメッセージに%sを付けるか次のコマンドを Henceforth に送信して下さい。\n`!delete -i %s`\n登録したメッセージを編集したい場合は次の Prefix を使って下さい。\n`!edit -i %s`",
 		parsedTime.Format("2006年01月02日 15時04分"),
 		body,
+		os.Getenv("DELETE_STAMP"),
 		id.String(),
 		id.String(),
 	)
@@ -70,8 +72,9 @@ func CreateSchMesPeriodicCreatedEditedMessage(parsedTime model.PeriodicTime, dis
 
 	// 残りの文字列を追加
 	mes += fmt.Sprintf(
-		"以下の内容を投稿します。\n```plaintext\n%s\n```\n登録を取り消したい場合は次のコマンドを Henceforth に送信して下さい。\n`!delete -i %s`\n登録したメッセージを編集したい場合は次の Prefix を使って下さい。\n`!edit -i %s`",
+		"以下の内容を投稿します。\n```plaintext\n%s\n```\n登録を取り消したい場合はこのメッセージに%sを付けるか、次のコマンドを Henceforth に送信して下さい。\n`!delete -i %s`\n登録したメッセージを編集したい場合は次の Prefix を使って下さい。\n`!edit -i %s`",
 		body,
+		os.Getenv("DELETE_STAMP"),
 		id.String(),
 		id.String(),
 	)
