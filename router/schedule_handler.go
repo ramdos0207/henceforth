@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"regexp"
 	"strings"
 	"time"
 
@@ -48,24 +49,23 @@ func timeplaceHandler(c echo.Context, api *api.API, repo repository.Repository, 
 	originalTime := strings.SplitN(req.GetText(), "\n", 4)[1]
 	body := strings.SplitN(req.GetText(), "\n", 4)[3]
 
-	distChannel := strings.SplitN(req.GetText(), "\n", 4)[2]
-	var distChannelID *string
-	for _, v := range req.GetEmbeddedList() {
-		if v.Raw == distChannel && v.Type == "channel" {
-			distChannelID = &v.ID
-			break
-		}
-	}
-	if distChannelID == nil {
+	distString := strings.SplitN(req.GetText(), "\n", 4)[2]
+	re1 := regexp.MustCompile(`"raw":"([^"]*)"`).FindStringSubmatch(distString)
+	re2 := regexp.MustCompile(`"id":"([^"]*)"`).FindStringSubmatch(distString)
+	fmt.Println(re1)
+	fmt.Println(re2)
+	if len(re1) == 0 || len(re2) == 0 {
 		service.SendCreateErrorMessage(api, req.GetChannelID(), fmt.Errorf("チャンネル情報が不正です"))
 		return c.JSON(http.StatusBadRequest, errorMessage{Message: "チャンネル情報が不正です"})
 	}
+	distChannel := re1[1]
+	distChannelID := re2[1]
 	formattedTime, err := service.Askllm(createTimeConvertPrompt(originalTime))
 	if err != nil {
 		service.SendCreateErrorMessage(api, req.GetChannelID(), fmt.Errorf("LLMによる時刻のパースに失敗しました\n%s", err))
 		return c.JSON(http.StatusBadRequest, errorMessage{Message: err.Error()})
 	}
-	return commonScheduleProcess(&formattedTime, &distChannel, distChannelID, &body, nil, c, api, repo, req)
+	return commonScheduleProcess(&formattedTime, &distChannel, &distChannelID, &body, nil, c, api, repo, req)
 }
 
 // リピート指定のみのコマンドハンドラー
@@ -88,24 +88,23 @@ func repeatplaceHandler(c echo.Context, api *api.API, repo repository.Repository
 	// メッセージをパースし、要素を取得
 	originalTime := strings.SplitN(req.GetText(), "\n", 4)[1]
 	body := strings.SplitN(req.GetText(), "\n", 4)[3]
-	distChannel := strings.SplitN(req.GetText(), "\n", 4)[2]
-	var distChannelID *string
-	for _, v := range req.GetEmbeddedList() {
-		if v.Raw == distChannel && v.Type == "channel" {
-			distChannelID = &v.ID
-			break
-		}
-	}
-	if distChannelID == nil {
+	distString := strings.SplitN(req.GetText(), "\n", 4)[2]
+	re1 := regexp.MustCompile(`"raw":"([^"]*)"`).FindStringSubmatch(distString)
+	re2 := regexp.MustCompile(`"id":"([^"]*)"`).FindStringSubmatch(distString)
+	fmt.Println(re1)
+	fmt.Println(re2)
+	if len(re1) == 0 || len(re2) == 0 {
 		service.SendCreateErrorMessage(api, req.GetChannelID(), fmt.Errorf("チャンネル情報が不正です"))
 		return c.JSON(http.StatusBadRequest, errorMessage{Message: "チャンネル情報が不正です"})
 	}
+	distChannel := re1[1]
+	distChannelID := re2[1]
 	formattedTime, err := service.Askllm(createRepeatConvertPrompt(originalTime))
 	if err != nil {
 		service.SendCreateErrorMessage(api, req.GetChannelID(), fmt.Errorf("LLMによる時刻のパースに失敗しました\n%s", err))
 		return c.JSON(http.StatusBadRequest, errorMessage{Message: err.Error()})
 	}
-	return commonScheduleProcess(&formattedTime, &distChannel, distChannelID, &body, nil, c, api, repo, req)
+	return commonScheduleProcess(&formattedTime, &distChannel, &distChannelID, &body, nil, c, api, repo, req)
 }
 
 // 各コマンドハンドラーに共通する処理
