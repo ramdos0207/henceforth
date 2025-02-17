@@ -42,6 +42,32 @@ func timeonlyHandler(c echo.Context, api *api.API, repo repository.Repository, r
 	return commonScheduleProcess(&formattedTime, &distChannel, &distChannelID, &body, nil, c, api, repo, req)
 }
 
+// 時刻・場所指定のコマンドハンドラー
+func timeplaceHandler(c echo.Context, api *api.API, repo repository.Repository, req *event.MessageEvent) error {
+	// メッセージをパースし、要素を取得
+	originalTime := strings.SplitN(req.GetText(), "\n", 3)[1]
+	body := strings.SplitN(req.GetText(), "\n", 3)[3]
+
+	distChannel := strings.SplitN(req.GetText(), "\n", 3)[2]
+	var distChannelID *string
+	for _, v := range req.GetEmbeddedList() {
+		if v.Raw == distChannel && v.Type == "channel" {
+			distChannelID = &v.ID
+			break
+		}
+	}
+	if distChannelID == nil {
+		service.SendCreateErrorMessage(api, req.GetChannelID(), fmt.Errorf("チャンネル情報が不正です"))
+		return c.JSON(http.StatusBadRequest, errorMessage{Message: "チャンネル情報が不正です"})
+	}
+	formattedTime, err := service.Askllm(createTimeConvertPrompt(originalTime))
+	if err != nil {
+		service.SendCreateErrorMessage(api, req.GetChannelID(), fmt.Errorf("LLMによる時刻のパースに失敗しました\n%s", err))
+		return c.JSON(http.StatusBadRequest, errorMessage{Message: err.Error()})
+	}
+	return commonScheduleProcess(&formattedTime, &distChannel, distChannelID, &body, nil, c, api, repo, req)
+}
+
 // リピート指定のみのコマンドハンドラー
 func repeatonlyHandler(c echo.Context, api *api.API, repo repository.Repository, req *event.MessageEvent) error {
 	// メッセージをパースし、要素を取得
@@ -55,6 +81,31 @@ func repeatonlyHandler(c echo.Context, api *api.API, repo repository.Repository,
 	}
 	distChannelID := req.GetChannelID()
 	return commonScheduleProcess(&formattedTime, &distChannel, &distChannelID, &body, nil, c, api, repo, req)
+}
+
+// リピート・場所指定のコマンドハンドラー
+func repeatplaceHandler(c echo.Context, api *api.API, repo repository.Repository, req *event.MessageEvent) error {
+	// メッセージをパースし、要素を取得
+	originalTime := strings.SplitN(req.GetText(), "\n", 3)[1]
+	body := strings.SplitN(req.GetText(), "\n", 3)[3]
+	distChannel := strings.SplitN(req.GetText(), "\n", 3)[2]
+	var distChannelID *string
+	for _, v := range req.GetEmbeddedList() {
+		if v.Raw == distChannel && v.Type == "channel" {
+			distChannelID = &v.ID
+			break
+		}
+	}
+	if distChannelID == nil {
+		service.SendCreateErrorMessage(api, req.GetChannelID(), fmt.Errorf("チャンネル情報が不正です"))
+		return c.JSON(http.StatusBadRequest, errorMessage{Message: "チャンネル情報が不正です"})
+	}
+	formattedTime, err := service.Askllm(createRepeatConvertPrompt(originalTime))
+	if err != nil {
+		service.SendCreateErrorMessage(api, req.GetChannelID(), fmt.Errorf("LLMによる時刻のパースに失敗しました\n%s", err))
+		return c.JSON(http.StatusBadRequest, errorMessage{Message: err.Error()})
+	}
+	return commonScheduleProcess(&formattedTime, &distChannel, distChannelID, &body, nil, c, api, repo, req)
 }
 
 // 各コマンドハンドラーに共通する処理

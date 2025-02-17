@@ -97,6 +97,12 @@ func messageEventHandler(c echo.Context, api *api.API, repo repository.Repositor
 	if strings.Contains(req.GetText(), "くりかえす") {
 		return repeatonlyHandler(c, api, repo, req)
 	}
+	if strings.Contains(req.GetText(), "いつどこ") {
+		return timeplaceHandler(c, api, repo, req)
+	}
+	if strings.Contains(req.GetText(), "くりかえすどこ") {
+		return repeatplaceHandler(c, api, repo, req)
+	}
 	if strings.Contains(req.GetText(), "!edit") {
 		return editHandler(c, api, repo, req)
 	}
