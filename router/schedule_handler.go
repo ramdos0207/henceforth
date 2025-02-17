@@ -45,10 +45,10 @@ func timeonlyHandler(c echo.Context, api *api.API, repo repository.Repository, r
 // 時刻・場所指定のコマンドハンドラー
 func timeplaceHandler(c echo.Context, api *api.API, repo repository.Repository, req *event.MessageEvent) error {
 	// メッセージをパースし、要素を取得
-	originalTime := strings.SplitN(req.GetText(), "\n", 3)[1]
-	body := strings.SplitN(req.GetText(), "\n", 3)[3]
+	originalTime := strings.SplitN(req.GetText(), "\n", 4)[1]
+	body := strings.SplitN(req.GetText(), "\n", 4)[3]
 
-	distChannel := strings.SplitN(req.GetText(), "\n", 3)[2]
+	distChannel := strings.SplitN(req.GetText(), "\n", 4)[2]
 	var distChannelID *string
 	for _, v := range req.GetEmbeddedList() {
 		if v.Raw == distChannel && v.Type == "channel" {
@@ -86,9 +86,9 @@ func repeatonlyHandler(c echo.Context, api *api.API, repo repository.Repository,
 // リピート・場所指定のコマンドハンドラー
 func repeatplaceHandler(c echo.Context, api *api.API, repo repository.Repository, req *event.MessageEvent) error {
 	// メッセージをパースし、要素を取得
-	originalTime := strings.SplitN(req.GetText(), "\n", 3)[1]
-	body := strings.SplitN(req.GetText(), "\n", 3)[3]
-	distChannel := strings.SplitN(req.GetText(), "\n", 3)[2]
+	originalTime := strings.SplitN(req.GetText(), "\n", 4)[1]
+	body := strings.SplitN(req.GetText(), "\n", 4)[3]
+	distChannel := strings.SplitN(req.GetText(), "\n", 4)[2]
 	var distChannelID *string
 	for _, v := range req.GetEmbeddedList() {
 		if v.Raw == distChannel && v.Type == "channel" {
