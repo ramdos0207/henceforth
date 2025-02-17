@@ -28,6 +28,8 @@
   削除スタンプの名前(スタンプ前後のコロン含めて)
 - `GEMINI_API_KEY`
   Gemini の API キー
+- `MESSAGE_URL_PREFIX`
+  メッセージ URL の preficx
 
 ## ローカルで動かすときのサンプル
 
@@ -49,6 +51,7 @@ export NS_MARIADB_PASSWORD=
 export DELETE_STAMP=
 export DELETE_STAMP_UUID=
 export GEMINI_API_KEY=
+export MESSAGE_URL_PREFIX=
 
 go run ./*.go
 ```

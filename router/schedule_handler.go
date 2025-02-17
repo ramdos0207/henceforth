@@ -3,6 +3,7 @@ package router
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -84,6 +85,7 @@ func commonScheduleProcess(time *string, distChannel *string, distChannelID *str
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, errorMessage{Message: fmt.Sprintf("failed to send message: %s", err)})
 			}
+			api.AddStamp(messageUUID, os.Getenv("DELETE_STAMP_UUID"))
 			fmt.Println(messageUUID)
 			userUUID := req.Message.User.ID
 			// 定期投稿メッセージをDB に 登録
@@ -124,6 +126,7 @@ func commonScheduleProcess(time *string, distChannel *string, distChannelID *str
 			return c.JSON(http.StatusInternalServerError, errorMessage{Message: fmt.Sprintf("failed to send message: %s", err)})
 		}
 		fmt.Println(messageUUID)
+		api.AddStamp(messageUUID, os.Getenv("DELETE_STAMP_UUID"))
 		userUUID := req.Message.User.ID
 		// 予約投稿メッセージを DB に登録
 		_, err = service.ResisterSchMes(repo, id, req.GetUserID(), userUUID, messageUUID, *parsedTime, *distChannelID, *body)

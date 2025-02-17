@@ -39,6 +39,13 @@ func (api *API) SendMessage(chanID string, message string) (string, error) {
 	}
 }
 
+func (api *API) AddStamp(messageID string, StampID string) error {
+	client := traq.NewAPIClient(traq.NewConfiguration())
+	auth := context.WithValue(context.Background(), traq.ContextAccessToken, api.Config.Bot_Access_Token)
+	_, err := client.StampApi.AddMessageStamp(auth, messageID, StampID).Execute()
+	return err
+}
+
 // デプロイ完了を config で設定したチャンネルに通知
 func (api *API) NotifyDeployed() {
 	api.SendMessage(api.Config.Log_Chan_ID, "Log: The new version of Henceforth is deployed.")
