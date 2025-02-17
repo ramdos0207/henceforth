@@ -230,7 +230,7 @@ func listHandler(c echo.Context, api *api.API, repo repository.Repository, req *
 // join コマンドハンドラー
 func joinHandler(c echo.Context, api *api.API, req *event.MessageEvent) error {
 	// チャンネルに JOIN する
-	err := api.ChannelAction("join", req.GetChannelID())
+	err := api.JoinChannel(req.GetChannelID())
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, errorMessage{Message: fmt.Sprintf("failed to join the channel: %s", err)})
 	}
@@ -241,7 +241,7 @@ func joinHandler(c echo.Context, api *api.API, req *event.MessageEvent) error {
 // leave コマンドハンドラー
 func leaveHandler(c echo.Context, api *api.API, req *event.MessageEvent) error {
 	// チャンネルから LEAVE する
-	err := api.ChannelAction("leave", req.GetChannelID())
+	err := api.LeaveChannel(req.GetChannelID())
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, errorMessage{Message: fmt.Sprintf("failed to leave the channel: %s", err)})
 	}

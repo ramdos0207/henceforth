@@ -5,10 +5,10 @@ import (
 )
 
 type API struct {
-	config *config.Config
+	Config *config.Config
 }
 
 func GetApi(c *config.Config) *API {
-	api := &API{config: c}
+	api := &API{Config: c}
 	return api
 }

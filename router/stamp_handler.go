@@ -28,7 +28,7 @@ func stampEventHandler(c echo.Context, api *api.API, repo repository.Repository)
 	fmt.Println(req)
 
 	client := traq.NewAPIClient(traq.NewConfiguration())
-	auth := context.WithValue(context.Background(), traq.ContextAccessToken, api.config.Bot_Access_Token)
+	auth := context.WithValue(context.Background(), traq.ContextAccessToken, api.Config.Bot_Access_Token)
 
 	v, _, err := client.MessageApi.GetMessage(auth, req.MessageID).Execute()
 	if err != nil {

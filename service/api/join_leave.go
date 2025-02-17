@@ -12,19 +12,19 @@ type ActionBody struct {
 }
 
 // 指定されたチャンネルに JOIN / LEAVE する
-func (api *API) JoinChannel(cmd string, chanID string) error {
+func (api *API) JoinChannel(chanID string) error {
 	client := traq.NewAPIClient(traq.NewConfiguration())
-	auth := context.WithValue(context.Background(), traq.ContextAccessToken, api.config.Bot_Access_Token)
+	auth := context.WithValue(context.Background(), traq.ContextAccessToken, api.Config.Bot_Access_Token)
 
-	_, err := client.BotApi.LetBotJoinChannel(auth, api.config.Bot_ID).PostBotActionJoinRequest(traq.PostBotActionJoinRequest{ChannelId: chanID}).Execute()
+	_, err := client.BotApi.LetBotJoinChannel(auth, api.Config.Bot_ID).PostBotActionJoinRequest(traq.PostBotActionJoinRequest{ChannelId: chanID}).Execute()
 
 	return err
 }
-func (api *API) LeaveChannel(cmd string, chanID string) error {
+func (api *API) LeaveChannel(chanID string) error {
 	client := traq.NewAPIClient(traq.NewConfiguration())
-	auth := context.WithValue(context.Background(), traq.ContextAccessToken, api.config.Bot_Access_Token)
+	auth := context.WithValue(context.Background(), traq.ContextAccessToken, api.Config.Bot_Access_Token)
 
-	_, err := client.BotApi.LetBotLeaveChannel(auth, api.config.Bot_ID).PostBotActionLeaveRequest(traq.PostBotActionLeaveRequest{ChannelId: chanID}).Execute()
+	_, err := client.BotApi.LetBotLeaveChannel(auth, api.Config.Bot_ID).PostBotActionLeaveRequest(traq.PostBotActionLeaveRequest{ChannelId: chanID}).Execute()
 
 	return err
 }
