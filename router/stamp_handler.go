@@ -1,6 +1,7 @@
 package router
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -12,6 +13,7 @@ import (
 	"github.com/logica0419/scheduled-messenger-bot/repository"
 	"github.com/logica0419/scheduled-messenger-bot/service"
 	"github.com/logica0419/scheduled-messenger-bot/service/api"
+	"github.com/traPtitech/go-traq"
 	"gorm.io/gorm"
 )
 
@@ -24,8 +26,17 @@ func stampEventHandler(c echo.Context, api *api.API, repo repository.Repository)
 	}
 
 	fmt.Println(req)
+
+	client := traq.NewAPIClient(traq.NewConfiguration())
+	auth := context.WithValue(context.Background(), traq.ContextAccessToken, api.config.Bot_Access_Token)
+
+	v, _, err := client.MessageApi.GetMessage(auth, req.MessageID).Execute()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, errorMessage{Message: fmt.Sprintf("failed to get message: %s", err)})
+	}
 	stampUUID := os.Getenv("DELETE_STAMP_UUID")
-	channnelID := "dummy"
+	channnelID := v.ChannelId
+
 	// 各スタンプについて検証
 	for _, stamp := range req.Stamps {
 		if stamp.StampID == stampUUID {
