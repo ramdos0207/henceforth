@@ -99,6 +99,34 @@ func DeleteSchMesPeriodicByID(repo repository.Repository, api *api.API, mesID st
 	return nil
 }
 
+// 指定された メッセージID に紐付く定期投稿メッセージを DB から削除
+func DeleteSchMesPeriodicByMessageID(repo repository.Repository, api *api.API, mesID string, userID string) error {
+	// ID を UUID に変換
+	mesUUID, err := uuid.Parse(mesID)
+	if err != nil {
+		return err
+	}
+
+	// 指定された ID のレコードを検索 (存在しない ID の検証)
+	mes, err := repo.GetSchMesPeriodicByMessageID(mesUUID)
+	if err != nil {
+		return err
+	}
+
+	// 予約したユーザーと削除を試みたユーザーが一致するか検証
+	if mes.UserUUID.String() != userID {
+		return ErrUserNotMatch
+	}
+
+	// DB から削除
+	err = repo.DeleteSchMesPeriodicByID(mes.ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // 定期投稿メッセージを更新
 func UpdateSchMesPeriodic(repo repository.Repository, ID string, time *model.PeriodicTime, channelID *string, body *string, repeat *int) (*model.SchMesPeriodic, error) {
 	// 指定された ID のレコードを取得

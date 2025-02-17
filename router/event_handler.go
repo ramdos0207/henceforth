@@ -13,11 +13,12 @@ import (
 )
 
 const (
-	pingEvent                 = "PING"                   // PING イベント
-	joinedEvent               = "JOINED"                 // JOINED イベント
-	leftEvent                 = "LEFT"                   // LEFT イベント
-	messageCreatedEvent       = "MESSAGE_CREATED"        // MESSAGE_CREATED イベント
-	directMessageCreatedEvent = "DIRECT_MESSAGE_CREATED" // DIRECT_MESSAGE_CREATED イベント
+	pingEvent                    = "PING"                       // PING イベント
+	joinedEvent                  = "JOINED"                     // JOINED イベント
+	leftEvent                    = "LEFT"                       // LEFT イベント
+	messageCreatedEvent          = "MESSAGE_CREATED"            // MESSAGE_CREATED イベント
+	directMessageCreatedEvent    = "DIRECT_MESSAGE_CREATED"     // DIRECT_MESSAGE_CREATED イベント
+	botMessageStampsUpdatedEvent = "BOT_MESSAGE_STAMPS_UPDATED" // BOT_MESSAGE_STAMPS_UPDATED イベント
 )
 
 // Botのハンドラ
@@ -32,6 +33,9 @@ func (r *Router) botEventHandler(c echo.Context) error {
 
 	case messageCreatedEvent, directMessageCreatedEvent:
 		return messageEventHandler(c, r.Api, r.Repo)
+
+	case botMessageStampsUpdatedEvent:
+		return stampEventHandler(c, r.Api, r.Repo)
 
 	default: // 未実装のイベント
 		return c.JSON(http.StatusNotImplemented, errorMessage{Message: "not implemented"})

@@ -22,6 +22,12 @@
   DB のユーザー名 (default: "root")
 - `NS_MARIADB_PASSWORD`
   DB のパスワード (default: "password")
+- `DELETE_STAMP_UUID`
+  削除スタンプの UUID
+- `DELETE_STAMP_NAME`
+  削除スタンプの名前(スタンプ前後のコロン含めて)
+- `GEMINI_API_KEY`
+  Gemini の API キー
 
 ## ローカルで動かすときのサンプル
 
@@ -40,6 +46,8 @@ export NS_MARIADB_HOSTNAME=
 export NS_MARIADB_DATABASE=
 export NS_MARIADB_USER=
 export NS_MARIADB_PASSWORD=
+export DELETE_STAMP=
+export DELETE_STAMP_UUID=
 export GEMINI_API_KEY=
 
 go run ./*.go

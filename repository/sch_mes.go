@@ -15,6 +15,9 @@ type SchMesRepository interface {
 	// 指定された UserID の予約投稿メッセージのレコードを全取得
 	GetSchMesByUserID(userID string) ([]*model.SchMes, error)
 
+	// 指定された ID の予約投稿メッセージのレコードを取得
+	GetSchMesByMessageID(mesID uuid.UUID) (*model.SchMes, error)
+
 	// 指定された時間より前の time を持つメッセージのレコードを全取得
 	GetSchMesByTime(time time.Time) ([]*model.SchMes, error)
 

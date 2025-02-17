@@ -50,6 +50,28 @@ func (repo *GormRepository) GetSchMesPeriodicByID(mesID uuid.UUID) (*model.SchMe
 	return schMesPeriodic, nil
 }
 
+// 指定された ID の定期投稿メッセージのレコードを取得
+func (repo *GormRepository) GetSchMesPeriodicByMessageID(mesID uuid.UUID) (*model.SchMesPeriodic, error) {
+	// キャッシュが存在すればそこから読み取って返す
+	content := repo.getSchMesPeriodicCache()
+	for _, v := range content {
+		if v.MessageID == mesID {
+			return v, nil
+		}
+	}
+
+	// 空のメッセージ構造体の変数を作成
+	var schMesPeriodic *model.SchMesPeriodic
+
+	// レコードを取得
+	res := repo.getTx().Where("message_id = ?", mesID).Take(&schMesPeriodic)
+	if res.Error != nil {
+		return nil, res.Error
+	}
+
+	return schMesPeriodic, nil
+}
+
 // 指定された UserID の予約投稿メッセージのレコードを全取得
 func (repo *GormRepository) GetSchMesPeriodicByUserID(userID string) ([]*model.SchMesPeriodic, error) {
 	// 空のメッセージ構造体の変数を作成

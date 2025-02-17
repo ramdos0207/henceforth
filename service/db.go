@@ -103,6 +103,34 @@ func DeleteSchMesByID(repo repository.Repository, api *api.API, mesID string, us
 	return nil
 }
 
+// 指定された メッセージID の予約投稿メッセージを DB から削除
+func DeleteSchMesByMessageID(repo repository.Repository, api *api.API, mesID string, userID string) error {
+	// ID を UUID に変換
+	mesUUID, err := uuid.Parse(mesID)
+	if err != nil {
+		return err
+	}
+
+	// 指定された ID のレコードを検索
+	mes, err := repo.GetSchMesByMessageID(mesUUID)
+	if err != nil {
+		return err
+	}
+
+	// 予約したユーザーと削除を試みたユーザーが一致するか検証
+	if mes.UserUUID.String() != userID {
+		return ErrUserNotMatch
+	}
+
+	// DB から削除
+	err = repo.DeleteSchMesByID(mes.ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // 予約投稿メッセージを更新
 func UpdateSchMes(repo repository.Repository, ID string, time *time.Time, channelID *string, body *string) (*model.SchMes, error) {
 	// 指定された ID のレコードを取得
