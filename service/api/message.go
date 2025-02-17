@@ -1,13 +1,14 @@
 package api
 
 import (
-	"encoding/json"
-	"fmt"
+	"context"
 	"log"
 
 	"github.com/google/uuid"
+	traq "github.com/traPtitech/go-traq"
 )
 
+/*
 // メッセージ投稿リクエストボディ
 type Message struct {
 	Content string `json:"content,omitempty"`
@@ -17,7 +18,7 @@ type MessageRes struct {
 	// メッセージUUID
 	Id string `json:"id"`
 }
-
+*/
 // 指定されたチャンネルに指定されたメッセージを投稿してメッセージの UUID を返す
 func (api *API) SendMessage(chanID string, message string) (string, error) {
 	// 開発モードではコンソールにメッセージを表示するのみ
@@ -26,22 +27,15 @@ func (api *API) SendMessage(chanID string, message string) (string, error) {
 		id, _ := uuid.NewRandom()
 		return id.String(), nil // ダミーの UUID を返す
 	} else {
-		// URL を生成
-		url := fmt.Sprintf("%s/channels/%s/messages", baseUrl, chanID)
+		client := traq.NewAPIClient(traq.NewConfiguration())
+		auth := context.WithValue(context.Background(), traq.ContextAccessToken, api.config.Bot_Access_Token)
 
-		// ボディを作成
-		body := Message{Content: message, Embed: false}
-
-		// リクエストを送信
-		res, err := api.post(url, body)
+		embed := false
+		v, _, err := client.MessageApi.PostMessage(auth, chanID).PostMessageRequest(traq.PostMessageRequest{Content: message, Embed: &embed}).Execute()
 		if err != nil {
 			return "", err
 		}
-		var mesRes MessageRes
-		if err := json.Unmarshal(res, &mesRes); err != nil {
-			return "", err
-		}
-		return mesRes.Id, nil
+		return v.Id, nil
 	}
 }
 

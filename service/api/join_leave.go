@@ -1,7 +1,9 @@
 package api
 
 import (
-	"fmt"
+	"context"
+
+	traq "github.com/traPtitech/go-traq"
 )
 
 // JOIN / LEAVE のリクエストボディ
@@ -10,17 +12,19 @@ type ActionBody struct {
 }
 
 // 指定されたチャンネルに JOIN / LEAVE する
-func (api *API) ChannelAction(cmd string, chanID string) error {
-	// URL を生成
-	url := fmt.Sprintf("%s/bots/%s/actions/%s", baseUrl, api.config.Bot_ID, cmd)
-	// ボディを作成
-	body := ActionBody{ChannelID: chanID}
+func (api *API) JoinChannel(cmd string, chanID string) error {
+	client := traq.NewAPIClient(traq.NewConfiguration())
+	auth := context.WithValue(context.Background(), traq.ContextAccessToken, api.config.Bot_Access_Token)
 
-	// リクエストを送信
-	_, err := api.post(url, body)
-	if err != nil {
-		return err
-	}
+	_, err := client.BotApi.LetBotJoinChannel(auth, api.config.Bot_ID).PostBotActionJoinRequest(traq.PostBotActionJoinRequest{ChannelId: chanID}).Execute()
 
-	return nil
+	return err
+}
+func (api *API) LeaveChannel(cmd string, chanID string) error {
+	client := traq.NewAPIClient(traq.NewConfiguration())
+	auth := context.WithValue(context.Background(), traq.ContextAccessToken, api.config.Bot_Access_Token)
+
+	_, err := client.BotApi.LetBotLeaveChannel(auth, api.config.Bot_ID).PostBotActionLeaveRequest(traq.PostBotActionLeaveRequest{ChannelId: chanID}).Execute()
+
+	return err
 }

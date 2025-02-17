@@ -1,6 +1,8 @@
 module github.com/logica0419/scheduled-messenger-bot
 
-go 1.21.5
+go 1.22
+
+toolchain go1.23.3
 
 require (
 	github.com/akamensky/argparse v1.4.0
@@ -13,6 +15,7 @@ require (
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.10.0
+	github.com/traPtitech/go-traq v0.0.0-20250202124846-f5198ed2b2d1
 	google.golang.org/api v0.186.0
 	gorm.io/driver/mysql v1.5.7
 	gorm.io/gorm v1.25.11
