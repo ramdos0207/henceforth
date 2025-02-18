@@ -103,6 +103,9 @@ func messageEventHandler(c echo.Context, api *api.API, repo repository.Repositor
 	if strings.Contains(req.GetText(), "くりかえす") {
 		return repeatonlyHandler(c, api, repo, req)
 	}
+	if strings.Contains(req.GetText(), "いらっしゃい") {
+		return joinHandler(c, api, req)
+	}
 	if strings.Contains(req.GetText(), "!edit") {
 		return editHandler(c, api, repo, req)
 	}
