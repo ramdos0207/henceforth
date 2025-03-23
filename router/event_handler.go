@@ -83,7 +83,6 @@ func messageEventHandler(c echo.Context, api *api.API, repo repository.Repositor
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, errorMessage{Message: fmt.Sprintf("failed to get request body: %s", err)})
 	}
-	fmt.Println(req.GetUserID(), req.GetText())
 
 	if strings.Contains(req.GetText(), "!help") {
 		return helpHandler(c, api, req)
