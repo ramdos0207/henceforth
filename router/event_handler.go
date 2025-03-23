@@ -91,19 +91,19 @@ func messageEventHandler(c echo.Context, api *api.API, repo repository.Repositor
 	if strings.Contains(req.GetText(), "!schedule") {
 		return scheduleHandler(c, api, repo, req)
 	}
-	if strings.Contains(req.GetText(), "いつどこ") {
+	if strings.Contains(req.GetText(), "いつどこ\n") {
 		return timeplaceHandler(c, api, repo, req)
 	}
-	if strings.Contains(req.GetText(), "くりかえすどこ") {
+	if strings.Contains(req.GetText(), "くりかえすどこ\n") {
 		return repeatplaceHandler(c, api, repo, req)
 	}
-	if strings.Contains(req.GetText(), "いつ") {
+	if strings.Contains(req.GetText(), "いつ\n") {
 		return timeonlyHandler(c, api, repo, req)
 	}
-	if strings.Contains(req.GetText(), "くりかえす") {
+	if strings.Contains(req.GetText(), "くりかえす\n") {
 		return repeatonlyHandler(c, api, repo, req)
 	}
-	if strings.Contains(req.GetText(), "いらっしゃい") {
+	if strings.Contains(req.GetText(), "いらっしゃい\n") {
 		return joinHandler(c, api, req)
 	}
 	if strings.Contains(req.GetText(), "!edit") {
