@@ -2,8 +2,6 @@ package router
 
 import (
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
-	"github.com/labstack/gommon/log"
 	"github.com/logica0419/scheduled-messenger-bot/config"
 	"github.com/logica0419/scheduled-messenger-bot/repository"
 	"github.com/logica0419/scheduled-messenger-bot/service/api"
@@ -44,9 +42,9 @@ func newEcho() *echo.Echo {
 	e := echo.New()
 
 	// ログの設定
-	e.Logger.SetLevel(log.DEBUG)
-	e.Logger.SetHeader("${time_rfc3339} ${prefix} ${short_file} ${line} |")
-	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{Format: "${time_rfc3339} method = ${method} | uri = ${uri} | status = ${status} ${error}\n"}))
+	// e.Logger.SetLevel(log.DEBUG)
+	// e.Logger.SetHeader("${time_rfc3339} ${prefix} ${short_file} ${line} |")
+	// e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{Format: "${time_rfc3339} method = ${method} | uri = ${uri} | status = ${status} ${error}\n"}))
 
 	return e
 }
