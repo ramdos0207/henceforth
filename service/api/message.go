@@ -21,9 +21,8 @@ type MessageRes struct {
 */
 // 指定されたチャンネルに指定されたメッセージを投稿してメッセージの UUID を返す
 func (api *API) SendMessage(chanID string, message string) (string, error) {
-	// 開発モードではコンソールにメッセージを表示するのみ
+	log.Printf("Sending\n%s\nto %s", message, chanID)
 	if api.Config.Dev_Mode {
-		log.Printf("Sending\n%s\nto %s", message, chanID)
 		id, _ := uuid.NewRandom()
 		return id.String(), nil // ダミーの UUID を返す
 	} else {
