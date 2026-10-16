@@ -26,8 +26,8 @@
   削除スタンプの UUID
 - `DELETE_STAMP_NAME`
   削除スタンプの名前(スタンプ前後のコロン含めて)
-- `GEMINI_API_KEY`
-  Gemini の API キー
+- `LLM_PROXY_API_KEY`
+  AI の API キー
 - `MESSAGE_URL_PREFIX`
   メッセージ URL の preficx
 
@@ -50,7 +50,7 @@ export NS_MARIADB_USER=
 export NS_MARIADB_PASSWORD=
 export DELETE_STAMP=
 export DELETE_STAMP_UUID=
-export GEMINI_API_KEY=
+export LLM_PROXY_API_KEY=
 export MESSAGE_URL_PREFIX=
 
 go run ./*.go

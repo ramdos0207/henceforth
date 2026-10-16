@@ -192,16 +192,32 @@ func commonScheduleProcess(time *string, distChannel *string, distChannelID *str
 
 // 時刻パース用のプロンプトを作成
 func createTimeConvertPrompt(originalTime string) string {
-	tomorrow := time.Now().AddDate(0, 0, 1)
-	answer1 := time.Date(tomorrow.Year(), tomorrow.Month(), tomorrow.Day(), 8, 0, 0, 0, time.Local).Format("2006/01/02/15:04")
-	answer2 := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 17, 0, 0, 0, time.Local).Format("2006/01/02/15:04")
-	nextweek := time.Now().AddDate(0, 0, 7)
-	anser3 := time.Date(nextweek.Year(), nextweek.Month(), nextweek.Day(), 8, 0, 0, 0, time.Local).Format("2006/01/02/15:04")
-	return fmt.Sprintf("あなたの仕事は、ユーザーから与えられた時刻をフォーマットすることです。現在時刻は%sです。時刻以外は何も返さないでください。いくつか例を示します。「明日の朝」→「%s」、「夕方」→「%s」、「来週」→「%s」。ユーザーから与えられた時刻: %s", time.Now().Format("2006/01/02/15:04"), answer1, answer2, anser3, originalTime)
+	now := time.Now()
+	tomorrow := now.AddDate(0, 0, 1)
+	nextweek := now.AddDate(0, 0, 7)
+	return fmt.Sprintf(`ユーザーから与えられた予約投稿の時刻を、指定されたJSONスキーマに従って返してください。
+現在時刻は%sです。year・month・day・hour・minuteには具体的な整数をそれぞれ入れ、weekdaysはnullにしてください。
+例:
+「明日の朝」→{"year":%d,"month":%d,"day":%d,"hour":8,"minute":0,"weekdays":null}
+「夕方」→{"year":%d,"month":%d,"day":%d,"hour":17,"minute":0,"weekdays":null}
+「来週」→{"year":%d,"month":%d,"day":%d,"hour":8,"minute":0,"weekdays":null}
+ユーザーから与えられた時刻: %s`, now.Format("2006/01/02/15:04"),
+		tomorrow.Year(), tomorrow.Month(), tomorrow.Day(), now.Year(), now.Month(), now.Day(),
+		nextweek.Year(), nextweek.Month(), nextweek.Day(), originalTime)
 }
 
 // リピート指定パース用のプロンプトを作成
 func createRepeatConvertPrompt(originalTime string) string {
-	currenttime := time.Now().Format("15:04")
-	return fmt.Sprintf("あなたの仕事は、ユーザーから与えられた反復タスクの予約を「年/月/日/時:分/曜日」形式にフォーマットすることです。曜日は日曜日が0、月曜日が1、火曜日が2、水曜日が3、木曜日が4、金曜日が5、土曜日が6で、&を用いて複数指定できます。年・月・日・時・分・曜日に関して、いつでも良い場合は「*」と指定してください。現在時刻は%sなので、ユーザーが日付のみを指定した場合は現在時刻を指定してください。フォーマットされた結果以外は何も返さないでください。いくつか例を示します。「毎年12月31日の夕方」→「*/12/31/17:00/*」、「平日」→「*/*/*/%s/1&2&3&4&5」、「毎週水曜の夜」→「*/*/*/20:00/3」、「13日」→「*/*/13/%s/*」、「毎朝」→「*/*/*/8:00/*」。ユーザーから与えられた予約情報: %s", time.Now().Format("2006/01/02/15:04"), currenttime, currenttime, originalTime)
+	now := time.Now()
+	return fmt.Sprintf(`ユーザーから与えられた定期投稿の時刻を、指定されたJSONスキーマに従って返してください。
+yearは常にnullにしてください。month・day・hour・minuteはそれぞれ整数で指定し、いつでも良い項目はnullにしてください。
+weekdaysは日曜日が0、月曜日が1、火曜日が2、水曜日が3、木曜日が4、金曜日が5、土曜日が6の整数配列です。重複を含めず、曜日指定なし・毎日の場合はnullにしてください。
+現在時刻は%sです。ユーザーが日付や曜日のみを指定した場合は現在の時・分を指定してください。
+例:
+「毎年12月31日の夕方」→{"year":null,"month":12,"day":31,"hour":17,"minute":0,"weekdays":null}
+「平日」→{"year":null,"month":null,"day":null,"hour":%d,"minute":%d,"weekdays":[1,2,3,4,5]}
+「毎週水曜の夜」→{"year":null,"month":null,"day":null,"hour":20,"minute":0,"weekdays":[3]}
+「13日」→{"year":null,"month":null,"day":13,"hour":%d,"minute":%d,"weekdays":null}
+「毎朝」→{"year":null,"month":null,"day":null,"hour":8,"minute":0,"weekdays":null}
+ユーザーから与えられた予約情報: %s`, now.Format("2006/01/02/15:04"), now.Hour(), now.Minute(), now.Hour(), now.Minute(), originalTime)
 }
